@@ -10,7 +10,6 @@ LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" 
 
 1. **Auto-Generated Riddles**  
    - Uses LLM  to generate riddles (for convenience, though AI-generated riddles are sick).  
-   - Focus on gameplay rather than riddle quality.  
 
 2. **AI Dungeon Master**  
    - The LLM strictly answers "YES/NO/YES OR NO" to player questions.  
