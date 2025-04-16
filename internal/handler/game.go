@@ -76,12 +76,12 @@ func GameAskQuestion(c *gin.Context) {
 		return
 	}
 
-	response, err := agent.Ask(req.Question)
+	rsp, err := agent.Ask(req.Question)
 	if err != nil {
 		log.Println("Failed to process question:", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process question"})
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, rsp)
 }
