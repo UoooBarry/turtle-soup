@@ -1,6 +1,8 @@
 # Soup (Turtle Soup) - AI Riddle Game
 
-LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" questions. The AI acts as the Dungeon Master (DM), answering only "YES," "NO," or "YES OR NO."
+[README.md](./README.md) [README.zh-cn.md](./README.zh-cn.md)
+
+LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" questions.
 
 ---
 
