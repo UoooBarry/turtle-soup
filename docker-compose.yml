@@ -1,0 +1,27 @@
+services:
+  app:
+    build: 
+      context: .
+      target: dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./log:/app/log
+      - go-mod-cache:/go/pkg/mod
+      - ./.env:/app/.env
+    environment:
+      - PORT=8080
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync+restart  # Rebuild on file changes
+          path: .
+          target: /app
+          ignore:
+            - Dockerfile
+            - go.sum
+            - data/
+    command: go run cmd/api/main.go
+volumes:
+  go-mod-cache:
