@@ -43,7 +43,10 @@ LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" 
 3. Run with Docker:  
    ```bash
    docker-compose up --watch
+   cd vue && bun dev
    ```
+
+4. Web version `http://localhost:5173`。  
 
 ## Roadmap
 

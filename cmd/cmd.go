@@ -32,7 +32,7 @@ var createCmd = &cobra.Command{
 		fmt.Print("Enter Soup Question: ")
 		fmt.Scanln(&soupEntry.SoupQuestion)
 		fmt.Print("Enter Soup Answer: ")
-		fmt.Scanln(&soupEntry.SoupAnswear)
+		fmt.Scanln(&soupEntry.SoupAnswer)
 		fmt.Print("Enter Soup Tags (JSON): ")
 		fmt.Scanln(&soupEntry.SoupTag)
 
@@ -55,7 +55,7 @@ var readCmd = &cobra.Command{
 			log.Printf("Failed to read soup: %v", err)
 			return
 		}
-		fmt.Printf("Soup Question: %s\nSoup Answer: %s\nTags: %s\n", soupEntry.SoupQuestion, soupEntry.SoupAnswear, soupEntry.SoupTag)
+		fmt.Printf("Soup Question: %s\nSoup Answer: %s\nTags: %s\n", soupEntry.SoupQuestion, soupEntry.SoupAnswer, soupEntry.SoupTag)
 	},
 }
 
@@ -78,11 +78,11 @@ var updateCmd = &cobra.Command{
 			soupEntry.SoupQuestion = newQuestion
 		}
 
-		fmt.Printf("Current Answer: %s\nNew Answer (leave blank to keep current): ", soupEntry.SoupAnswear)
+		fmt.Printf("Current Answer: %s\nNew Answer (leave blank to keep current): ", soupEntry.SoupAnswer)
 		var newAnswer string
 		fmt.Scanln(&newAnswer)
 		if newAnswer != "" {
-			soupEntry.SoupAnswear = newAnswer
+			soupEntry.SoupAnswer = newAnswer
 		}
 
 		fmt.Printf("Current Tags: %s\nNew Tags (JSON, leave blank to keep current): ", soupEntry.SoupTag)

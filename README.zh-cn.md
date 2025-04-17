@@ -39,9 +39,10 @@ LLM“海龟汤”谜题游戏。玩家通过提问“是/否”问题来推理�
 3. 使用 Docker 运行：  
    ```bash
    docker-compose up
+   cd vue && bun dev
    ```
 
-4. 通过 CLI 或 API 开始游戏（详见 `cmd/` 目录）。  
+4. 网页版`http://localhost:5173`。  
 
 ---
 

@@ -22,6 +22,7 @@ services:
             - Dockerfile
             - go.sum
             - data/
+            - vue/
     command: go run cmd/api/main.go
 volumes:
   go-mod-cache:

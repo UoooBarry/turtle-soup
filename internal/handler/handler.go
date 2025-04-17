@@ -17,6 +17,7 @@ func InitRoutes(r *gin.Engine) {
 	r.GET("/soups", ListSoups)
 
 	r.POST("/game/create", CreateGame)
-	r.POST("/game/start", StartGame)
-	r.POST("/game/ask", GameAskQuestion)
+	r.POST("/game/:uuid/start", StartGame)
+	r.POST("/game/:uuid/ask", GameAskQuestion)
+	r.DELETE("/game/:uuid/end", EndGame)
 }

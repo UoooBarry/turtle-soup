@@ -12,16 +12,11 @@ type CreateGameRequest struct {
 	SoupID uint `json:"soup_id" binding:"required"`
 }
 
-type StartGameRequest struct {
-	UUID string `json:"uuid" binding:"required"`
-}
-
 type CreateGameResponse struct {
 	UUID string `json:"uuid"`
 }
 
 type AskQuestionRequest struct {
-	UUID     string `json:"uuid" binding:"required"`
 	Question string `json:"question" binding:"required"`
 }
 
@@ -43,15 +38,11 @@ func CreateGame(c *gin.Context) {
 }
 
 func StartGame(c *gin.Context) {
-	var req StartGameRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
-		return
-	}
+	uuid := c.Param("uuid")
 
-	agent, exist := gameagent.GetSession(req.UUID)
+	agent, exist := gameagent.GetSession(uuid)
 	if !exist {
-		log.Println("Session not found for UUID:", req.UUID)
+		log.Println("Session not found for UUID:", uuid)
 		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
 		return
 	}
@@ -59,6 +50,7 @@ func StartGame(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start game"})
 		return
 	}
+	c.JSON(http.StatusOK, nil)
 }
 
 func GameAskQuestion(c *gin.Context) {
@@ -69,9 +61,10 @@ func GameAskQuestion(c *gin.Context) {
 		return
 	}
 
-	agent, exists := gameagent.GetSession(req.UUID)
+	uuid := c.Param("uuid")
+	agent, exists := gameagent.GetSession(uuid)
 	if !exists {
-		log.Println("Session not found for UUID:", req.UUID)
+		log.Println("Session not found for UUID:", uuid)
 		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
 		return
 	}
@@ -84,4 +77,16 @@ func GameAskQuestion(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, rsp)
+}
+
+func EndGame(c *gin.Context) {
+	uuid := c.Param("uuid")
+	_, exist := gameagent.GetSession(uuid)
+	if !exist {
+		log.Println("Session not found for UUID:", uuid)
+		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
+		return
+	}
+	gameagent.EndSession(uuid)
+	c.JSON(http.StatusOK, nil)
 }
