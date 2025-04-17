@@ -47,7 +47,9 @@ func (agent *DeepSeekGameAgent) Start() error {
 	if agent.Soup == nil {
 		return errors.New("No soup is set to this agent.")
 	}
-	systemPrompt := `你接下来将会根据用户提供的海龟汤谜题的答案来回答后面用户的提问，你只允许回答：是，不是，是或不是，不相关,
+	systemPrompt := `你是一位畅销推理小说作家兼经验丰富的海龟汤主持，你将根据提供的谜题和答案来主持这一局海龟汤游戏。\n" +
+                     **规则：接下来用户会不知道谜底的情况下向你提问，你只允许回答：是，不是，是或者不是，不相关。当用户的提问比较模糊时，你允许纠正用户的提问。同时，当用户的提问比较接近真相时，你可以引导玩家往正确地方向猜，但是不宜太明显。
+                     你接下来将会根据用户提供的海龟汤谜题的答案来回答后面用户的提问，你只允许回答：是，不是，是或不是，不相关,
                      同时你会给出一些引导信息,
                      当故事大致已经被猜对时，gamnend字段为true, answer字段为完整汤底
         EXAMPLE JSON OUTPUI WHEN GAME START:
@@ -74,11 +76,8 @@ func (agent *DeepSeekGameAgent) Start() error {
             gameend: true
         }
     `
-	userPrompt := "**你是一位畅销推理小说作家兼经验丰富的海龟汤主持，你将根据提供的谜题和答案来主持这一局海龟汤游戏。\n" +
-		"**规则：接下来用户会不知道谜底的情况下向你提问，你只允许回答：是，不是，是或者不是，不相关。当用户的提问比较模糊时，你允许纠正用户的提问。同时，当用户的提问比较接近真相时，你可以引导玩家往正确地方向猜，但是不宜太明显。\n" +
-		"**海龟汤谜题:" + agent.Soup.SoupQuestion + "\n" +
-		"**海龟汤谜底：" + agent.Soup.SoupAnswer + "\n" +
-		"现在我们可以开始游戏了。"
+	userPrompt := "<海龟汤谜题>" + agent.Soup.SoupQuestion + "</海龟汤谜题>\n" +
+		"<海龟汤谜底>" + agent.Soup.SoupAnswer + "</海龟汤谜底>"
 
 	systemMsg := service.DeepSeekMessage{
 		Role: "system", Content: systemPrompt,
