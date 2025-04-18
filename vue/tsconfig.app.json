@@ -11,11 +11,10 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "baseUrl": "./src",
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "plugins": [{ "name": "@vue/typescript-plugin" }],
-    "types": ["node"]
+    "types": ["node", "vuetify"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/*.vue"]
 }
