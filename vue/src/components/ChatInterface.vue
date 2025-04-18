@@ -181,7 +181,7 @@ onMounted(async () => {
 .messages-container {
     flex: 1;
     overflow-y: auto;
-    padding: 0;
+    padding-top: 0;
     background-color: #f9f9f9;
     scroll-behavior: smooth;
     max-height: calc(100vh - 112px);
@@ -191,6 +191,9 @@ onMounted(async () => {
 .system-message {
     background-color: #f0f7ff;
     border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .message-wrapper {
