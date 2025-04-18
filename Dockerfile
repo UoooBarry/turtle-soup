@@ -42,7 +42,7 @@ WORKDIR /app
 # Copy pre-built files
 COPY --from=builder /app/bin/api .
 COPY --from=builder /app/bin/cli .
-COPY --from=builder /app/data /app/data
+RUN mkdir -p ./data
 
 EXPOSE 8080
 
