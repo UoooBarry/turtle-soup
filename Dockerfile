@@ -1,4 +1,4 @@
-ARG PORT=8080
+ARG PORT=8082
 ARG GO_ENV=production
 
 FROM golang:1.24-alpine AS base
@@ -33,7 +33,7 @@ ENV GO_ENV=development
 
 COPY . .
 RUN go mod download
-EXPOSE 8080
+EXPOSE $PORT
 
 # Prod stage
 FROM alpine:latest AS prod
@@ -44,7 +44,7 @@ COPY --from=builder /app/bin/api .
 COPY --from=builder /app/bin/cli .
 RUN mkdir -p ./data
 
-EXPOSE 8080
+EXPOSE $PORT
 
 # Run the binary
 CMD ["./api"]

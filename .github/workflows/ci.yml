@@ -96,7 +96,7 @@ jobs:
 
             echo "Starting new Docker container..."
             touch .env
-            docker run --env-file .env --network=host --restart=always -d --name turtle-soup -p 8080:8080 ${{ secrets.DOCKER_IMAGE_TAG }}:prod
+            docker run --env-file .env --network=host --restart=always -d --name turtle-soup -p 8082:8082 ${{ secrets.DOCKER_IMAGE_TAG }}:prod
 
             echo "Testing and reloading Nginx..."
             sudo nginx -t

@@ -4,14 +4,14 @@ services:
       context: .
       target: dev
     ports:
-      - "8080:8080"
+      - "8082:8082"
     volumes:
       - ./data:/app/data
       - ./log:/app/log
       - go-mod-cache:/go/pkg/mod
       - ./.env:/app/.env
     environment:
-      - PORT=8080
+      - PORT=8082
     restart: unless-stopped
     develop:
       watch:
