@@ -47,4 +47,4 @@ RUN mkdir -p ./data
 EXPOSE $PORT
 
 # Run the binary
-CMD ["./api"]
+CMD ["./bin/api"]

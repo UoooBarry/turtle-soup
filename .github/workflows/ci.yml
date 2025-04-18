@@ -79,6 +79,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
+      - name: Bun install
+        run: cd vue && bun install
+
       - name: Build project
         run: cd vue && bun build
 
