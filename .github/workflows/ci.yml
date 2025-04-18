@@ -82,7 +82,7 @@ jobs:
             docker rm turtle-soup || true
 
             echo "Pulling latest code from Git repository..."
-            cd /var/www/turtle-soup
+            cd ${{ secrets.REPO_PATH }}
             git pull
 
             echo "Building .env"
