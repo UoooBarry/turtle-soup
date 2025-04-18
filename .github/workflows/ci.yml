@@ -61,6 +61,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: vue/node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node_modules-${{ runner.os }}-
+
+      - name: Cache Bun modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Build project
+        run: cd vue && bun build
+
       - name: SSH and Deploy
         if: github.ref == 'refs/heads/main'
         env:
@@ -75,6 +96,8 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
+
+          rsync -avz --delete vue/dist/ $DEPLOY_USER@$DEPLOY_SERVER:${{ secrets.REPO_PATH }}/vue/dist
 
           ssh -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER << 'EOF'
             set -e
