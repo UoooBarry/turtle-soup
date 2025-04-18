@@ -1,7 +1,7 @@
+FROM golang:1.24-alpine AS base
+
 ARG PORT=8082
 ARG GO_ENV=production
-
-FROM golang:1.24-alpine AS base
 
 ENV GO111MODULE=on \
     CGO_ENABLED=1 \
@@ -47,4 +47,4 @@ RUN mkdir -p ./data
 EXPOSE $PORT
 
 # Run the binary
-CMD ["/app/bin/api"]
+CMD ["./api"]

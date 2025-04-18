@@ -48,6 +48,9 @@ jobs:
         file: Dockerfile
         push: true
         target: prod
+        build-args: |
+            PORT=8082
+            GO_ENV=production
         tags: ${{ secrets.DOCKER_IMAGE_TAG }}:prod
         cache-from: type=registry,ref=${{ secrets.DOCKER_IMAGE_TAG }}:prod
         cache-to: type=inline
@@ -83,6 +86,8 @@ jobs:
         run: cd vue && bun install
 
       - name: Build project
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: cd vue && bun run build
 
       - name: SSH and Deploy
