@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	gameagent "uooobarry/soup/internal/game_agent"
+	"uooobarry/soup/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,14 +21,22 @@ type AskQuestionRequest struct {
 	Question string `json:"question" binding:"required"`
 }
 
-func CreateGame(c *gin.Context) {
+type GameHandler struct {
+	soupService *service.SoupService
+}
+
+func NewGameHandler(s *service.SoupService) *GameHandler {
+	return &GameHandler{soupService: s}
+}
+
+func (handler *GameHandler) CreateGame(c *gin.Context) {
 	var req CreateGameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	agent, err := gameagent.NewSession(req.SoupID)
+	agent, err := gameagent.NewSession(req.SoupID, handler.soupService)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create the game"})
 		return
@@ -37,7 +46,7 @@ func CreateGame(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func StartGame(c *gin.Context) {
+func (handler *GameHandler) StartGame(c *gin.Context) {
 	uuid := c.Param("uuid")
 
 	agent, exist := gameagent.GetSession(uuid)
@@ -53,7 +62,7 @@ func StartGame(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func GameAskQuestion(c *gin.Context) {
+func (handler *GameHandler) GameAskQuestion(c *gin.Context) {
 	var req AskQuestionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Invalid request:", err.Error())
@@ -79,7 +88,7 @@ func GameAskQuestion(c *gin.Context) {
 	c.JSON(http.StatusOK, rsp)
 }
 
-func EndGame(c *gin.Context) {
+func (handler *GameHandler) EndGame(c *gin.Context) {
 	uuid := c.Param("uuid")
 	_, exist := gameagent.GetSession(uuid)
 	if !exist {

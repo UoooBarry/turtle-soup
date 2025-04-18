@@ -2,6 +2,7 @@ package gameagent
 
 import (
 	"sync"
+	"uooobarry/soup/internal/service"
 )
 
 var (
@@ -9,11 +10,11 @@ var (
 	sessionMux sync.Mutex
 )
 
-func NewSession(soupID uint) (Agent, error) {
+func NewSession(soupID uint, s *service.SoupService) (Agent, error) {
 	sessionMux.Lock()
 	defer sessionMux.Unlock()
 
-	agent, err := InitDS(soupID)
+	agent, err := InitDS(soupID, s)
 	if err != nil {
 		return nil, err
 	}

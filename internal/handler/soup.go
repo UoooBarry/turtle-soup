@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"uooobarry/soup/internal/model"
+	"uooobarry/soup/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/datatypes"
@@ -15,9 +15,17 @@ type SoupResponse struct {
 	Enabled      bool           `json:"enabled" gorm:"default:true"`
 }
 
-func ListSoups(c *gin.Context) {
-	var soups []model.Soup
-	if err := model.DB.Find(&soups).Error; err != nil {
+type SoupHandler struct {
+	service *service.SoupService
+}
+
+func NewSoupHandler(service *service.SoupService) *SoupHandler {
+	return &SoupHandler{service: service}
+}
+
+func (h *SoupHandler) ListSoups(c *gin.Context) {
+	soups, err := h.service.List()
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}

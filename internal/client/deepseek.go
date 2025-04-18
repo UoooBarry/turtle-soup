@@ -1,4 +1,4 @@
-package service
+package client
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"resty.dev/v3"
 )
 
-type DeepSeekService struct {
+type DeepSeekClient struct {
 	BaseUri string
 	ApiKey  string
 	Client  *resty.Client
@@ -52,11 +52,11 @@ type DeepSeekResponseFormat struct {
 	Type string `json:"type"`
 }
 
-func InitDS(baseUri string, apiKey string) *DeepSeekService {
-	return &DeepSeekService{BaseUri: baseUri, ApiKey: apiKey, Client: resty.New()}
+func InitDS(baseUri string, apiKey string) *DeepSeekClient {
+	return &DeepSeekClient{BaseUri: baseUri, ApiKey: apiKey, Client: resty.New()}
 }
 
-func (ds *DeepSeekService) R() *resty.Request {
+func (ds *DeepSeekClient) R() *resty.Request {
 	return ds.Client.R().SetHeader("Accept", "application/json").SetHeader("Authorization", fmt.Sprintf("Bearer %s", ds.ApiKey))
 }
 
@@ -79,7 +79,7 @@ func SetResponseFmt(fmt string) ChatOption {
 	}
 }
 
-func (ds *DeepSeekService) Chat(question *DeepSeekMessage, prevs []*DeepSeekMessage, opts ...ChatOption) (*DeepSeekResponse, error) {
+func (ds *DeepSeekClient) Chat(question *DeepSeekMessage, prevs []*DeepSeekMessage, opts ...ChatOption) (*DeepSeekResponse, error) {
 	// Config optional arugments
 	cfg := ChatConfig{
 		Model:          "deepseek-chat",

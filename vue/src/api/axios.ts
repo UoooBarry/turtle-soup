@@ -1,12 +1,17 @@
 import { default as axios } from 'axios';
-
 import { MessageType } from '@/types/globalMessage';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
 });
 
-instance.interceptors.request.use(function(config) {
+instance.interceptors.request.use(async function(config) {
+  const { useAuthStore } = await import('@/stores/authStore');
+  const authStore = useAuthStore();
+  if (authStore.isAuthenticated && authStore.token) {
+    config.headers.Authorization = `Bearer ${authStore.token}`;
+  }
+
   return config;
 }, function(error) {
   return Promise.reject(error);

@@ -5,18 +5,18 @@ import (
 	"errors"
 	"log"
 	"os"
+	"uooobarry/soup/internal/client"
 	"uooobarry/soup/internal/model"
 	"uooobarry/soup/internal/service"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 )
 
 type DeepSeekGameAgent struct {
 	UUID        string
-	Service     *service.DeepSeekService
+	client      *client.DeepSeekClient
 	Soup        *model.Soup
-	PerviousMsg []*service.DeepSeekMessage
+	PerviousMsg []*client.DeepSeekMessage
 }
 
 type GameResponse struct {
@@ -26,21 +26,16 @@ type GameResponse struct {
 	GameEnd  bool   `json:"gameend"`
 }
 
-func InitDS(soupID uint) (*DeepSeekGameAgent, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
+func InitDS(soupID uint, service *service.SoupService) (*DeepSeekGameAgent, error) {
 	baseUri := os.Getenv("DEEPSEEK_BASE_URI")
 	apiKey := os.Getenv("DEEPSEEK_API_KEY")
-	s := service.InitDS(baseUri, apiKey)
+	s := client.InitDS(baseUri, apiKey)
 
-	var soup model.Soup
-	if err := model.DB.First(&soup, soupID).Error; err != nil {
+	soup, err := service.GetByID(soupID)
+	if err != nil {
 		return nil, err
 	}
-	return &DeepSeekGameAgent{Service: s, UUID: uuid.New().String(), Soup: &soup}, nil
+	return &DeepSeekGameAgent{client: s, UUID: uuid.New().String(), Soup: soup}, nil
 }
 
 func (agent *DeepSeekGameAgent) Start() error {
@@ -79,12 +74,12 @@ func (agent *DeepSeekGameAgent) Start() error {
 	userPrompt := "<海龟汤谜题>" + agent.Soup.SoupQuestion + "</海龟汤谜题>\n" +
 		"<海龟汤谜底>" + agent.Soup.SoupAnswer + "</海龟汤谜底>"
 
-	systemMsg := service.DeepSeekMessage{
+	systemMsg := client.DeepSeekMessage{
 		Role: "system", Content: systemPrompt,
 	}
-	userMsg := service.DeepSeekMessage{Role: "user", Content: userPrompt}
+	userMsg := client.DeepSeekMessage{Role: "user", Content: userPrompt}
 	agent.AppendMsg(&systemMsg)
-	rsp, err := agent.Service.Chat(&userMsg, agent.PerviousMsg, service.SetModel("deepseek-chat"), service.SetResponseFmt("json_object"))
+	rsp, err := agent.client.Chat(&userMsg, agent.PerviousMsg, client.SetModel("deepseek-chat"), client.SetResponseFmt("json_object"))
 	if err != nil {
 		return err
 	}
@@ -95,14 +90,14 @@ func (agent *DeepSeekGameAgent) Start() error {
 	return nil
 }
 
-func (agent *DeepSeekGameAgent) AppendMsg(msg *service.DeepSeekMessage) {
+func (agent *DeepSeekGameAgent) AppendMsg(msg *client.DeepSeekMessage) {
 	agent.PerviousMsg = append(agent.PerviousMsg, msg)
 }
 
 func (agent *DeepSeekGameAgent) Ask(question string) (*GameResponse, error) {
-	userMsg := service.DeepSeekMessage{Role: "user", Content: question}
+	userMsg := client.DeepSeekMessage{Role: "user", Content: question}
 
-	rsp, err := agent.Service.Chat(&userMsg, agent.PerviousMsg, service.SetModel("deepseek-chat"), service.SetResponseFmt("json_object"))
+	rsp, err := agent.client.Chat(&userMsg, agent.PerviousMsg, client.SetModel("deepseek-chat"), client.SetResponseFmt("json_object"))
 	if err != nil {
 		return nil, err
 	}

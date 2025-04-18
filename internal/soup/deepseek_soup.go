@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"uooobarry/soup/internal/client"
 	"uooobarry/soup/internal/model"
 	"uooobarry/soup/internal/service"
 
 	"github.com/joho/godotenv"
 )
 
-func FetchSoupFromDS() error {
+func FetchSoupFromDS(soupService *service.SoupService) error {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -19,7 +20,7 @@ func FetchSoupFromDS() error {
 
 	baseUri := os.Getenv("DEEPSEEK_BASE_URI")
 	apiKey := os.Getenv("DEEPSEEK_API_KEY")
-	s := service.InitDS(baseUri, apiKey)
+	s := client.InitDS(baseUri, apiKey)
 
 	systemPrompt := `用户会让你生成海龟汤，你将会把汤面汤底和标签转换成纯JSON格式
         EXAMPLE JSON OUTPUT:
@@ -36,11 +37,11 @@ func FetchSoupFromDS() error {
                    **提示：海龟汤需要逻辑严密的同时充满创意，不宜出现夫妻出轨之类的俗套狗血剧情。剧情需要完整不要突兀地结束。
                    **补充: 汤面与汤底不能相差过多的信息不能与汤底有过多的信息差。`
 
-	systemMsg := []*service.DeepSeekMessage{
+	systemMsg := []*client.DeepSeekMessage{
 		{Role: "system", Content: systemPrompt},
 	}
-	userMsg := service.DeepSeekMessage{Role: "user", Content: userPrompt}
-	rsp, err := s.Chat(&userMsg, systemMsg, service.SetModel("deepseek-chat"), service.SetResponseFmt("json_object"))
+	userMsg := client.DeepSeekMessage{Role: "user", Content: userPrompt}
+	rsp, err := s.Chat(&userMsg, systemMsg, client.SetModel("deepseek-chat"), client.SetResponseFmt("json_object"))
 	if err != nil {
 		return err
 	}
@@ -52,7 +53,7 @@ func FetchSoupFromDS() error {
 		return fmt.Errorf("failed to unmarshal response: %v", err)
 	}
 
-	if err := model.DB.Create(&soup).Error; err != nil {
+	if err := soupService.Create(&soup).Error; err != nil {
 		return fmt.Errorf("failed to store soup in database: %v", err)
 	}
 

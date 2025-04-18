@@ -8,24 +8,26 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB() {
+func InitDB() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("data/sqlite.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect to database:", err)
 	}
 
-	// Migrate all models
-	AutoMigrate(db, &model.User{})
-	AutoMigrate(db, &model.Soup{})
-
-	model.DB = db
+	MigrateAll(db)
 	log.Print("db is ready")
+
+	return db
 }
 
-func AutoMigrate(db *gorm.DB, model any) {
-	err := db.AutoMigrate(model)
-	if err != nil {
-		log.Fatal("failed to migrate database:", err)
+func MigrateAll(db *gorm.DB) error {
+	models := []any{
+		&model.User{},
+		&model.Soup{},
 	}
 
+	if err := db.AutoMigrate(models...); err != nil {
+		return err
+	}
+	return nil
 }
