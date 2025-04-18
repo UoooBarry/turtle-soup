@@ -83,7 +83,7 @@ jobs:
         run: cd vue && bun install
 
       - name: Build project
-        run: cd vue && bun build
+        run: cd vue && bun run build
 
       - name: SSH and Deploy
         if: github.ref == 'refs/heads/main'
