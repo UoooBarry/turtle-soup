@@ -19,6 +19,7 @@ type CreateGameResponse struct {
 
 type AskQuestionRequest struct {
 	Question string `json:"question" binding:"required"`
+	NeedHint bool   `json:"need_hint"`
 }
 
 type GameHandler struct {
@@ -78,7 +79,7 @@ func (handler *GameHandler) GameAskQuestion(c *gin.Context) {
 		return
 	}
 
-	rsp, err := session.Agent.Ask(req.Question)
+	rsp, err := session.Agent.Ask(req.Question, req.NeedHint)
 	if err != nil {
 		log.Println("Failed to process question:", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process question"})

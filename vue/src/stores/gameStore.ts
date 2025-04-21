@@ -39,8 +39,8 @@ export const useGameStore = defineStore('game', () => {
       })
   }
 
-  const askGame = async (question: string): Promise<AskGameResponse> => {
-    const { data } = await postAskGame(sessionID.value, question)
+  const askGame = async (question: string, needHint: boolean): Promise<AskGameResponse> => {
+    const { data } = await postAskGame(sessionID.value, question, needHint)
     if (data.gameend === true) {
       state.value = GameState.Finished
       gameAnswer.value = data.answer

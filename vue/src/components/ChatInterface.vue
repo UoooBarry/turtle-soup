@@ -16,7 +16,7 @@
                 <!-- System message -->
                 <div class="system-message pa-4 text-center">
                     <v-chip color="primary" variant="outlined" size="small">
-                        <v-icon start>mdi-lightbulb-on-outline</v-icon>
+                        <v-icon start>mdi-lightbulb-question-outline</v-icon>
                         汤面
                     </v-chip>
                     <div class="mt-2 text-body-1">{{ soupStore.currentSoup.soup_question }}</div>
@@ -74,14 +74,27 @@
         <v-divider></v-divider>
 
         <v-card-actions class="pa-3 input-area">
-            <v-text-field v-model="newMessage" label="输入你的推理或提问..." variant="outlined" density="comfortable" hide-details
-                rounded single-line autofocus @keyup.enter="sendMessage" :disabled="waitingForResponse">
-                <template v-slot:append-inner>
-                    <v-btn icon="mdi-send" color="primary" variant="tonal" @click="sendMessage"
-                        :disabled="!newMessage.trim() || waitingForResponse">
-                    </v-btn>
-                </template>
-            </v-text-field>
+            <v-row no-gutters>
+                <v-col cols="12" class="pa-0">
+                    <v-checkbox v-model="needHint" density="compact" color="primary" class="mt-0 pt-0">
+                        <template v-slot:label>
+                            <v-icon>mdi-lightbulb-on-outline</v-icon>
+                            <span class="text-caption">提示</span>
+                        </template>
+                    </v-checkbox>
+
+                    <v-textarea v-model="newMessage" label="输入你的推理或提问..." variant="outlined" density="comfortable" hide-details
+                        rounded single-line autofocus @keyup.enter="sendMessage" :rows="3" :disabled="waitingForResponse" class="mt-0 pt-0">
+                        <template v-slot:append-inner>
+                            <div class="d-flex align-center" style="height: 100%;">
+                                <v-btn icon="mdi-send" color="primary" variant="tonal" @click="sendMessage"
+                                    :disabled="!newMessage.trim() || waitingForResponse">
+                                </v-btn>
+                            </div>
+                        </template>
+                    </v-textarea>
+                </v-col>
+            </v-row>
         </v-card-actions>
     </v-card>
 </template>
@@ -107,6 +120,7 @@ const globalMsgStore = useMessageStore()
 const messages = ref<Message[]>([]);
 const newMessage = ref('');
 const waitingForResponse = ref(true);
+const needHint = ref(false);
 
 const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -137,18 +151,20 @@ const sendMessage = async () => {
     waitingForResponse.value = true;
     await nextTick();
     scrollToBottom();
-    const res = await gameStore.askGame(userMessage.text);
+    const res = await gameStore.askGame(userMessage.text, needHint.value);
 
     messages.value.push({
         text: res.answer,
         sender: 'bot' as const,
         timestamp: new Date(),
     });
-    messages.value.push({
-        text: res.hint,
-        sender: 'bot' as const,
-        timestamp: new Date(),
-    });
+    if (res.hint && res.hint.length > 0) {
+        messages.value.push({
+            text: res.hint,
+            sender: 'bot' as const,
+            timestamp: new Date(),
+        });
+    }
 
     await nextTick();
     scrollToBottom();
