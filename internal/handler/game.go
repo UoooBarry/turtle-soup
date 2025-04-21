@@ -36,26 +36,26 @@ func (handler *GameHandler) CreateGame(c *gin.Context) {
 		return
 	}
 
-	agent, err := gameagent.NewSession(req.SoupID, handler.soupService)
+	session, err := gameagent.NewSession(req.SoupID, handler.soupService)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create the game"})
 		return
 	}
 
-	resp := CreateGameResponse{UUID: agent.(*gameagent.DeepSeekGameAgent).UUID}
+	resp := CreateGameResponse{UUID: session.Agent.(*gameagent.DeepSeekGameAgent).UUID}
 	c.JSON(http.StatusOK, resp)
 }
 
 func (handler *GameHandler) StartGame(c *gin.Context) {
 	uuid := c.Param("uuid")
 
-	agent, exist := gameagent.GetSession(uuid)
+	session, exist := gameagent.GetSession(uuid)
 	if !exist {
 		log.Println("Session not found for UUID:", uuid)
 		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
 		return
 	}
-	if err := agent.Start(); err != nil {
+	if err := session.Agent.Start(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start game"})
 		return
 	}
@@ -71,14 +71,14 @@ func (handler *GameHandler) GameAskQuestion(c *gin.Context) {
 	}
 
 	uuid := c.Param("uuid")
-	agent, exists := gameagent.GetSession(uuid)
+	session, exists := gameagent.GetSession(uuid)
 	if !exists {
 		log.Println("Session not found for UUID:", uuid)
 		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
 		return
 	}
 
-	rsp, err := agent.Ask(req.Question)
+	rsp, err := session.Agent.Ask(req.Question)
 	if err != nil {
 		log.Println("Failed to process question:", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process question"})
