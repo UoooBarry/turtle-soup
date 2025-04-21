@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 	"uooobarry/soup/internal/model"
 
 	"gorm.io/driver/sqlite"
@@ -9,7 +10,8 @@ import (
 )
 
 func InitDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("data/sqlite.db"), &gorm.Config{})
+	sqlitePath := os.Getenv("PRIMARY_SQLITE_PATH")
+	db, err := gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect to database:", err)
 	}

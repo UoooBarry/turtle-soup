@@ -38,6 +38,7 @@ EXPOSE $PORT
 # Prod stage
 FROM alpine:latest AS prod
 WORKDIR /app
+VOLUME /app/data
 
 # Copy pre-built files
 COPY --from=builder /app/bin/api .
