@@ -127,9 +127,8 @@ jobs:
             docker pull ${{ secrets.DOCKER_IMAGE_TAG }}:prod
 
             echo "Starting new Docker container..."
-            touch .env
             docker run --env-file .env --network=host --restart=always -d --name turtle-soup -p 8082:8082 \
-              -v /app/$PRIMARY_SQLITE_PATH:${{ secrets.REPO_PATH }}/$PRIMARY_SQLITE_PATH \
+              -v ${{ secrets.REPO_PATH }}/$PRIMARY_SQLITE_PATH:/app/$PRIMARY_SQLITE_PATH \
               ${{ secrets.DOCKER_IMAGE_TAG }}:prod
 
             echo "Testing and reloading Nginx..."
