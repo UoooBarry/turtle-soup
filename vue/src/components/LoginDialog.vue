@@ -5,21 +5,20 @@
             <a class="cursor-pointer" @click="handleLogout" v-else>logout</a>
         </template>
         <v-card class="pa-1">
-            <v-card-title>Login</v-card-title>
+            <v-card-title>
+                <div class="d-flex flex-row justify-space-between">
+                    <div>
+                        Login
+                    </div>
+                    <div>
+                        <LanguagePicker></LanguagePicker>
+                    </div>
+                </div>
+            </v-card-title>
             <v-card-text>
                 <v-form @submit.prevent="handleLogin">
-                    <v-text-field
-                        v-model="username"
-                        label="Username"
-                        type="username"
-                        required
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="password"
-                        label="Password"
-                        type="password"
-                        required
-                    ></v-text-field>
+                    <v-text-field v-model="username" label="Username" type="username" required></v-text-field>
+                    <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
                     <v-btn type="submit" color="primary" block>Login</v-btn>
                 </v-form>
             </v-card-text>
@@ -34,6 +33,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
+import LanguagePicker from './LanguagePicker.vue';
 
 const authStore = useAuthStore();
 const dialog = ref(false);
