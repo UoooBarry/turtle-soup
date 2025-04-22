@@ -1,6 +1,6 @@
 # Soup (Turtle Soup) - AI Riddle Game
 
-[README.md](./README.md) [README.zh-cn.md](./README.zh-cn.md)
+[English](./README.md) [中文](./README.zh-cn.md)
 
 LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" questions.
 
@@ -53,4 +53,4 @@ LLM "Turtle Soup," a riddle game where players guess a story by asking "YES/NO" 
 - [ ] Support more LLMs.  
 - [ ] Add multiplayer mode.  
 - [ ] Implement full game logic.  
-- [ ] i18n Prompt management
+- [ x ] i18n Prompt management

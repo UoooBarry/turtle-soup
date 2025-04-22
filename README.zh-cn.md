@@ -1,6 +1,6 @@
 # Soup (海龟汤) - AI 谜题游戏
 
-[README.md](./README.md) [README.zh-cn.md](./README.zh-cn.md)
+[English](./README.md) [中文](./README.zh-cn.md)
 
 LLM“海龟汤”谜题游戏。玩家通过提问“是/否”问题来推理故事。
 
@@ -51,4 +51,4 @@ LLM“海龟汤”谜题游戏。玩家通过提问“是/否”问题来推理�
 - [ ] 支持更多大语言模型。  
 - [ ] 添加多人游戏模式。  
 - [ ] 完成游戏逻辑。  
-- [ ] i18n提示词管理。
+- [ X ] i18n提示词管理。

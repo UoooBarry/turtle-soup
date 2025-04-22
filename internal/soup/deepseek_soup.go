@@ -43,7 +43,10 @@ func FetchSoupFromDS(soupService *service.SoupService) error {
 		{Role: "system", Content: systemPrompt},
 	}
 	userMsg := client.DeepSeekMessage{Role: "user", Content: userPrompt}
-	rsp, err := s.Chat(&userMsg, systemMsg, client.SetModel("deepseek-chat"), client.SetResponseFmt("json_object"))
+	rsp, err := s.Chat(&userMsg, systemMsg,
+		client.SetModel("deepseek-chat"),
+		client.SetResponseFmt("json_object"),
+		client.SetTemperature(0.8))
 	if err != nil {
 		return err
 	}

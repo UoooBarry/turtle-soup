@@ -46,6 +46,7 @@ type DeepSeekRequestBody struct {
 	Model          string                 `json:"model"`
 	Messages       []DeepSeekMessage      `json:"messages"`
 	ResponseFormat DeepSeekResponseFormat `json:"response_format"`
+	Temperature    float64                `json:"temperature"`
 }
 
 type DeepSeekResponseFormat struct {
@@ -65,6 +66,7 @@ type ChatOption func(*ChatConfig)
 type ChatConfig struct {
 	Model          string
 	ResponseFormat string
+	Temperature    float64
 }
 
 func SetModel(model string) ChatOption {
@@ -79,11 +81,18 @@ func SetResponseFmt(fmt string) ChatOption {
 	}
 }
 
+func SetTemperature(tmp float64) ChatOption {
+	return func(cfg *ChatConfig) {
+		cfg.Temperature = tmp
+	}
+}
+
 func (ds *DeepSeekClient) Chat(question *DeepSeekMessage, prevs []*DeepSeekMessage, opts ...ChatOption) (*DeepSeekResponse, error) {
 	// Config optional arugments
 	cfg := ChatConfig{
 		Model:          "deepseek-chat",
 		ResponseFormat: "text",
+		Temperature:    1,
 	}
 	for _, opt := range opts {
 		opt(&cfg)
@@ -105,6 +114,7 @@ func (ds *DeepSeekClient) Chat(question *DeepSeekMessage, prevs []*DeepSeekMessa
 		ResponseFormat: DeepSeekResponseFormat{
 			Type: cfg.ResponseFormat,
 		},
+		Temperature: cfg.Temperature,
 	}
 
 	// Send the request with the body
@@ -112,18 +122,18 @@ func (ds *DeepSeekClient) Chat(question *DeepSeekMessage, prevs []*DeepSeekMessa
 		SetBody(requestBody).
 		Post(fmt.Sprintf("%s/chat/completions", ds.BaseUri))
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %v", err)
+		return nil, ErrAPIRequest{Message: err.Error()}
 	}
 	defer resp.Body.Close()
 
 	if resp.IsError() {
-		return nil, fmt.Errorf("request status error: %s, body: %s", resp.Status(), resp.String())
+		return nil, ErrAPIResponse{Status: resp.Status(), Body: resp.String()}
 	}
 	log.Print(resp.String())
 
 	var dsr DeepSeekResponse
 	if err := json.NewDecoder(resp.Body).Decode(&dsr); err != nil {
-		return nil, fmt.Errorf("parsed JSON failed: %v", err)
+		return nil, ErrAPIRequest{Message: err.Error()}
 	}
 
 	return &dsr, nil
