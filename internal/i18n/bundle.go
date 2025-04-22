@@ -31,14 +31,24 @@ func NewI18nHelper() *I18nHelper {
 }
 
 func (helper *I18nHelper) GetLocalizer(c *gin.Context) *i18n.Localizer {
-	lang, exist := c.Get("i18n")
+	lang, exist := c.Get("lang")
 	if !exist {
-		lang = language.Chinese.String()
+		return defaultLocalizer(helper.Bundle)
 	}
 
-	if tag, ok := lang.(language.Tag); ok {
-		return i18n.NewLocalizer(helper.Bundle, tag.String())
+	langStr, ok := lang.(string)
+	if !ok {
+		return defaultLocalizer(helper.Bundle)
 	}
 
-	return i18n.NewLocalizer(helper.Bundle, language.Chinese.String())
+	switch langStr {
+	case "zh", "en":
+		return i18n.NewLocalizer(helper.Bundle, langStr)
+	default:
+		return defaultLocalizer(helper.Bundle)
+	}
+}
+
+func defaultLocalizer(b *i18n.Bundle) *i18n.Localizer {
+	return i18n.NewLocalizer(b, language.Chinese.String())
 }

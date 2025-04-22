@@ -77,8 +77,11 @@ func (agent *DeepSeekGameAgent) Start() error {
 	}
 
 	userPrompt, err := agent.Localizer.Localize(&i18n.LocalizeConfig{
-		MessageID:    "userPrompt",
-		TemplateData: map[string]string{"soupQuestion": agent.Soup.SoupQuestion},
+		MessageID: "userPrompt",
+		TemplateData: map[string]string{
+			"soupQuestion": agent.Soup.SoupQuestion,
+			"soupAnswer":   agent.Soup.SoupAnswer,
+		},
 	})
 	if err != nil {
 		return err
@@ -111,7 +114,7 @@ func (agent *DeepSeekGameAgent) Ask(question string, needHint bool) (*GameRespon
 	var err error
 	maxRetries := 3
 
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		rsp, err = agent.client.Chat(&userMsg,
 			agent.PerviousMsg,
 			client.SetModel("deepseek-chat"),
