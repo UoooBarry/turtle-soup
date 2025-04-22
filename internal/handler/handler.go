@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"uooobarry/soup/internal/i18n"
 	"uooobarry/soup/internal/middleware"
 	"uooobarry/soup/internal/repository"
 	"uooobarry/soup/internal/service"
@@ -11,6 +12,9 @@ import (
 )
 
 func InitRoutes(r *gin.Engine, db *gorm.DB) {
+	i18nHelper := i18n.NewI18nHelper()
+	r.Use(middleware.I18nMildware(i18nHelper))
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",

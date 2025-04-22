@@ -2,9 +2,9 @@
     <v-card class="chat-container" flat>
         <v-toolbar color="primary" density="compact">
             <v-toolbar-title class="text-white">
-                海龟汤Bot
+                {{ t('appTitle') }}
                 <template v-if="preparingLLM">
-                    [正在为你准备AI Bot助手...]
+                    [{{ t('gamePreparing') }}]
                 </template>
             </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -17,7 +17,7 @@
                 <div class="system-message pa-4 text-center">
                     <v-chip color="primary" variant="outlined" size="small">
                         <v-icon start>mdi-lightbulb-question-outline</v-icon>
-                        汤面
+                        {{ t('gameRiddle') }}
                     </v-chip>
                     <div class="mt-2 text-body-1">{{ soupStore.currentSoup.soup_question }}</div>
                     <div class="mt-2">
@@ -79,11 +79,11 @@
                     <v-checkbox v-model="needHint" density="compact" color="primary" class="mt-0 pt-0">
                         <template v-slot:label>
                             <v-icon>mdi-lightbulb-on-outline</v-icon>
-                            <span class="text-caption">提示</span>
+                            <span class="text-caption">{{ t('gameHint') }}</span>
                         </template>
                     </v-checkbox>
 
-                    <v-textarea v-model="newMessage" label="输入你的推理或提问..." variant="outlined" density="comfortable" hide-details
+                    <v-textarea v-model="newMessage" :label="t('gameInput')" variant="outlined" density="comfortable" hide-details
                         rounded single-line autofocus @keyup.enter="sendMessage" :rows="3" :disabled="waitingForResponse" class="mt-0 pt-0">
                         <template v-slot:append-inner>
                             <div class="d-flex align-center" style="height: 100%;">
@@ -107,6 +107,7 @@ import { onMounted } from 'vue';
 import { useMessageStore } from '@/stores/messageStore';
 import { MessageType } from '@/types/globalMessage';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n'
 
 interface Message {
     text: string;
@@ -121,6 +122,7 @@ const messages = ref<Message[]>([]);
 const newMessage = ref('');
 const waitingForResponse = ref(true);
 const needHint = ref(false);
+const { t } = useI18n()
 
 const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

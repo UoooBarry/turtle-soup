@@ -36,5 +36,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
+
+		c.Next()
 	}
 }

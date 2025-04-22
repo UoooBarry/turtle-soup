@@ -1,13 +1,19 @@
 import { defineStore } from 'pinia'
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, watch } from 'vue'
 import type { User } from '@/types/user'
 import { postLogin, getProfile } from '@/api/auth'
 import type { LoginResponse, LoginRequest } from '@/api/auth'
+import i18n from '@/i18n'
 
 export const useAuthStore = defineStore('auth', () => {
   const user: Ref<User | null> = ref(null)
   const token: Ref<string | null> = ref(null)
   const isAuthenticated: Ref<boolean> = ref(false)
+  const language: Ref<'zh' | 'en'> = ref('zh')
+
+  watch(language, (newLang) => {
+    i18n.global.locale.value = newLang;
+  })
 
   async function login(payload: LoginRequest): Promise<LoginResponse> {
     try {
@@ -36,13 +42,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function restoreLogin() {
-    const storeToken = localStorage.getItem('auth-token')
+    const storeToken = localStorage.getItem('auth-token');
+    const storeLang = localStorage.getItem('lang') as 'zh' | 'en' | null;
 
     if (storeToken) {
       token.value = storeToken
       isAuthenticated.value = true
 
       await fetchProfile()
+    }
+    if (storeLang) {
+      language.value = storeLang
     }
   }
 
@@ -53,6 +63,10 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth-token')
   }
 
+  function setLanguage(lang: 'zh' | 'en') {
+    language.value = lang
+  }
+
   return {
     user,
     token,
@@ -60,7 +74,9 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     fetchProfile,
     logout,
-    restoreLogin
+    restoreLogin,
+    language,
+    setLanguage
   }
 })
 

@@ -5,6 +5,7 @@ import './style.css'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
+import { createI18n } from 'vue-i18n'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
@@ -26,6 +27,9 @@ const vuetify = createVuetify({
   },
 })
 
+import i18n from './i18n'
+
 app.use(vuetify)
 app.use(pinia)
+app.use(i18n)
 app.mount('#app')

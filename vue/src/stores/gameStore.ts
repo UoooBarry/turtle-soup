@@ -53,7 +53,7 @@ export const useGameStore = defineStore('game', () => {
       await deleteEndGame(sessionID.value)
       sessionID.value = ''
       return Promise.resolve(true)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
       return Promise.reject(false)
     } finally {

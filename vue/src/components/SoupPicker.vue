@@ -3,13 +3,13 @@
         <v-container class="py-8">
             <v-row class="mb-6">
                 <v-col cols="12" class="text-center">
-                    <h1 class="text-h4 font-weight-bold primary--text mb-2">海龟汤bot</h1>
+                    <h1 class="text-h4 font-weight-bold primary--text mb-2">{{ t('appTitle') }}</h1>
                     <p class="text-subtitle-1 grey--text text--darken-1">
-                        <a href="https://github.com/UoooBarry/turtle-soup" target="_blank"
-                            class="text-decoration-none">
+                        <a href="https://github.com/UoooBarry/turtle-soup" target="_blank" class="text-decoration-none">
                             <v-icon>mdi-github</v-icon>
                             Github
                         </a>
+                        <LanguagePicker></LanguagePicker>
                     </p>
                 </v-col>
             </v-row>
@@ -39,7 +39,7 @@
 
                         <v-card-actions class="px-4 pb-3">
                             <v-btn color="primary" block depressed class="text-capitalize">
-                                开始挑战
+                                {{ t('gameStart') }}
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -53,9 +53,12 @@
 import { useSoupStore } from '@/stores/soupStore'
 import { useGameStore } from '@/stores/gameStore'
 import type { Soup } from '@/types/soup';
+import { useI18n } from 'vue-i18n'
+import LanguagePicker from './LanguagePicker.vue';
 
 const soupStore = useSoupStore()
 const gameStore = useGameStore()
+const { t } = useI18n()
 
 const selectSoup = (soup: Soup) => {
     soupStore.setCurrentSoup(soup)

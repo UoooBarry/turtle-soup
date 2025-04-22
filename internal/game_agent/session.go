@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 	"uooobarry/soup/internal/service"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type SessionInfo struct {
@@ -19,11 +21,11 @@ var (
 	timeout    = 30 * time.Minute
 )
 
-func NewSession(soupID uint, s *service.SoupService) (*SessionInfo, error) {
+func NewSession(soupID uint, s *service.SoupService, l *i18n.Localizer) (*SessionInfo, error) {
 	sessionMux.Lock()
 	defer sessionMux.Unlock()
 
-	agent, err := InitDS(soupID, s)
+	agent, err := InitDS(soupID, s, l)
 	if err != nil {
 		return nil, err
 	}

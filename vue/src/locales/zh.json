@@ -1,0 +1,10 @@
+{
+  "appTitle": "海龟汤bot",
+  "gameStart": "开始挑战",
+  "gameRiddle": "汤面",
+  "gameHint": "提示",
+  "gameInput": "输入你的推理或者提问...",
+  "gamePreparing": "正在为你准备AI Bot助手...",
+  "zh": "中文",
+  "en": "English"
+}

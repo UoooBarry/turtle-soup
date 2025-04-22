@@ -11,6 +11,7 @@ instance.interceptors.request.use(async function(config) {
   if (authStore.isAuthenticated && authStore.token) {
     config.headers.Authorization = `Bearer ${authStore.token}`;
   }
+  config.headers['Accept-Language'] = authStore.language;
 
   return config;
 }, function(error) {
