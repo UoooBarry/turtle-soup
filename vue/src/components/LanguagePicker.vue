@@ -48,7 +48,6 @@ const languageIcon = computed(() => {
 
 const setLanguage = (lang: 'zh' | 'en') => {
   authStore.setLanguage(lang);
-  localStorage.setItem('lang', lang);
 };
 </script>
 

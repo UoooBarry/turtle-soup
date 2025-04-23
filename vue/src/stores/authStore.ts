@@ -65,6 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function setLanguage(lang: 'zh' | 'en') {
     language.value = lang
+    localStorage.setItem('lang', lang)
   }
 
   return {
