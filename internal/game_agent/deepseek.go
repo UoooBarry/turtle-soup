@@ -71,6 +71,10 @@ func (agent *DeepSeekGameAgent) Start() error {
 	}
 	systemPrompt, err := agent.Localizer.Localize(&i18n.LocalizeConfig{
 		MessageID: "systemPrompt",
+		TemplateData: map[string]string{
+			"soupQuestion": agent.Soup.SoupQuestion,
+			"soupAnswer":   agent.Soup.SoupAnswer,
+		},
 	})
 	if err != nil {
 		return err
@@ -78,10 +82,6 @@ func (agent *DeepSeekGameAgent) Start() error {
 
 	userPrompt, err := agent.Localizer.Localize(&i18n.LocalizeConfig{
 		MessageID: "userPrompt",
-		TemplateData: map[string]string{
-			"soupQuestion": agent.Soup.SoupQuestion,
-			"soupAnswer":   agent.Soup.SoupAnswer,
-		},
 	})
 	if err != nil {
 		return err
