@@ -17,29 +17,38 @@ func InitRoutes(r *gin.Engine, db *gorm.DB) {
 	r.Use(middleware.I18nMildware(i18nHelper))
 	r.Use(middleware.ErrorHandleMiddleware())
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 	soupRepo := repository.NewSoupRepository(db)
 	soupService := service.NewSoupService(soupRepo)
 	soupHandler := handler.NewSoupHandler(soupService)
-	r.GET("/soups", soupHandler.ListSoups)
 
 	authRepo := repository.NewAuthRepository(db)
 	authService := service.NewAuthService(authRepo)
 	authHandler := handler.NewAuthHandler(authService)
-	r.POST("/auth/login", authHandler.Login)
 
-	authGroup := r.Group("/")
-	authGroup.Use(middleware.JWTAuthMiddleware())
+	gameHandler := handler.NewGameHandler(soupService, authService)
+
+	public := r.Group("/")
 	{
-		gameHandler := handler.NewGameHandler(soupService, authService)
-		authGroup.POST("/game/create", gameHandler.CreateGame)
-		authGroup.POST("/game/:uuid/start", gameHandler.StartGame)
-		authGroup.POST("/game/:uuid/ask", gameHandler.GameAskQuestion)
-		authGroup.DELETE("/game/:uuid/end", gameHandler.EndGame)
-		authGroup.GET("/auth/profile", authHandler.Profile)
+		public.GET("/soups", soupHandler.ListSoups)
+		public.POST("/auth/login", authHandler.Login)
+		r.GET("/ping", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
+	}
+
+	protected := r.Group("/")
+	protected.Use(middleware.JWTAuthMiddleware())
+	{
+		protected.GET("/auth/profile", authHandler.Profile)
+
+		game := protected.Group("/game")
+		{
+			game.POST("/create", gameHandler.CreateGame)
+			game.POST("/:uuid/start", gameHandler.StartGame)
+			game.POST("/:uuid/ask", gameHandler.GameAskQuestion)
+			game.DELETE("/:uuid/end", gameHandler.EndGame)
+		}
 	}
 }
