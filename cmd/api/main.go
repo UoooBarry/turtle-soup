@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"uooobarry/soup/config"
-	"uooobarry/soup/internal/handler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
