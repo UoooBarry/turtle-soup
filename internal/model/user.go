@@ -1,14 +1,18 @@
 package model
 
 import (
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID       uint   `json:"id" gorm:"primaryKey"`
-	Username string `json:"username" gorm:"unique;not null" validate:"required"`
-	Email    string `json:"email" gorm:"unique" validate:"required"`
-	Password string `json:"-" gorm:"unique;not null" validate:"required"`
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	Username  string    `json:"username" gorm:"unique;not null" validate:"required"`
+	Email     string    `json:"email" gorm:"unique" validate:"required"`
+	Password  string    `json:"-" gorm:"unique;not null" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (u *User) EncryptPassword() error {

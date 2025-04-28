@@ -26,7 +26,7 @@ func NewSoupHandler(service *service.SoupService) *SoupHandler {
 func (h *SoupHandler) ListSoups(c *gin.Context) {
 	soups, err := h.service.List()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		NewNotfoundError()
 		return
 	}
 

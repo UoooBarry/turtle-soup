@@ -16,7 +16,11 @@ func InitDB() *gorm.DB {
 		log.Fatal("failed to connect to database:", err)
 	}
 
-	MigrateAll(db)
+	err = MigrateAll(db)
+	if err != nil {
+		log.Fatal("failed to migrate tables:", err)
+	}
+
 	log.Print("db is ready")
 
 	return db

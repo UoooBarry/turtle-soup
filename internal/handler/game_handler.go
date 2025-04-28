@@ -24,25 +24,30 @@ type AskQuestionRequest struct {
 }
 
 type GameHandler struct {
+	*AuthenticatedHandler
 	soupService *service.SoupService
 }
 
-func NewGameHandler(s *service.SoupService) *GameHandler {
-	return &GameHandler{soupService: s}
+func NewGameHandler(s *service.SoupService, a *service.AuthService) *GameHandler {
+	return &GameHandler{
+		soupService:          s,
+		AuthenticatedHandler: &AuthenticatedHandler{authService: a},
+	}
 }
 
 func (handler *GameHandler) CreateGame(c *gin.Context) {
 	var req CreateGameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Error(NewInternalError())
 		return
 	}
 
 	helper := c.MustGet("i18n").(*i18n.I18nHelper)
 	localizer := helper.GetLocalizer(c)
-	session, err := gameagent.NewSession(req.SoupID, handler.soupService, localizer)
+	user := handler.AuthenticatedHandler.GetCurrentUser(c)
+	session, err := gameagent.NewSession(req.SoupID, user, handler.soupService, localizer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create the game"})
+		c.Error(NewInternalError())
 		return
 	}
 
@@ -51,56 +56,52 @@ func (handler *GameHandler) CreateGame(c *gin.Context) {
 }
 
 func (handler *GameHandler) StartGame(c *gin.Context) {
-	uuid := c.Param("uuid")
-	session, exist := gameagent.GetSession(uuid)
-	if !exist {
-		log.Println("Session not found for UUID:", uuid)
-		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
-		return
-	}
+	_, session := handler.getCurrentSession(c)
 	if err := session.Agent.Start(); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start game"})
+		c.Error(NewInternalError())
 		return
 	}
 	c.JSON(http.StatusOK, nil)
 }
 
 func (handler *GameHandler) GameAskQuestion(c *gin.Context) {
-
 	var req AskQuestionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Invalid request:", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.Error(NewInvalidRequest())
 		return
 	}
 
-	uuid := c.Param("uuid")
-	session, exists := gameagent.GetSession(uuid)
-	if !exists {
-		log.Println("Session not found for UUID:", uuid)
-		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
-		return
-	}
+	uuid, session := handler.getCurrentSession(c)
 
 	rsp, err := session.Agent.Ask(req.Question, req.NeedHint)
 	if err != nil {
 		log.Println("Failed to process question:", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process question"})
+		c.Error(NewInternalError())
 		return
+	}
+	if rsp.GameEnd == true {
+		gameagent.EndSession(uuid)
 	}
 
 	c.JSON(http.StatusOK, rsp)
 }
 
 func (handler *GameHandler) EndGame(c *gin.Context) {
-	uuid := c.Param("uuid")
-	_, exist := gameagent.GetSession(uuid)
-	if !exist {
-		log.Println("Session not found for UUID:", uuid)
-		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
-		return
-	}
+	uuid, _ := handler.getCurrentSession(c)
 	gameagent.EndSession(uuid)
 	c.JSON(http.StatusOK, nil)
+}
+
+func (handler *GameHandler) getCurrentSession(c *gin.Context) (string, *gameagent.SessionInfo) {
+	uuid := c.Param("uuid")
+	session, exist := gameagent.GetSession(uuid)
+	if !exist {
+		log.Println("Session not found for UUID:", uuid)
+		c.Error(NewNotfoundError(WithCustomMessage("session not found")))
+		return "", nil
+	}
+
+	return uuid, session
 }

@@ -24,13 +24,13 @@ type RegisterRequest struct {
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewInvalidRequest())
 		return
 	}
 
 	user, err := h.service.Register(req.Username, req.Password, req.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Error(NewInternalError(WithCustomMessage(err.Error())))
 		return
 	}
 
@@ -45,13 +45,13 @@ type LoginRequest struct {
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewInvalidRequest(WithCustomMessage(err.Error())))
 		return
 	}
 
 	user, token, err := h.service.Login(req.Username, req.Password)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.Error(NewUnauthorizedError())
 		return
 	}
 
@@ -65,13 +65,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 func (h *AuthHandler) Profile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.Error(NewUnauthorizedError())
 		return
 	}
 
 	user, err := h.service.GetUserByID(userID.(uint))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Error(NewInternalError())
 		return
 	}
 

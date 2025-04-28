@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 	"time"
+	"uooobarry/soup/internal/model"
 	"uooobarry/soup/internal/service"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -13,6 +14,7 @@ import (
 type SessionInfo struct {
 	Agent      Agent
 	LastActive time.Time
+	Users      []*model.User
 }
 
 var (
@@ -21,7 +23,7 @@ var (
 	timeout    = 30 * time.Minute
 )
 
-func NewSession(soupID uint, s *service.SoupService, l *i18n.Localizer) (*SessionInfo, error) {
+func NewSession(soupID uint, user *model.User, s *service.SoupService, l *i18n.Localizer) (*SessionInfo, error) {
 	sessionMux.Lock()
 	defer sessionMux.Unlock()
 
@@ -36,6 +38,7 @@ func NewSession(soupID uint, s *service.SoupService, l *i18n.Localizer) (*Sessio
 		LastActive: time.Now(),
 	}
 	sessions[uuid] = session
+	session.Users = append(session.Users, user)
 
 	return session, nil
 }

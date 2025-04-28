@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
-import { postCreateGame, postStartGame, postAskGame, type AskGameResponse, deleteEndGame } from '@/api/game.api'
+import { postCreateGame, postStartGame, postAskGame, type AskGameResponse } from '@/api/game.api'
 
 export enum GameState {
   Picking = 'PICKING',
@@ -48,17 +48,8 @@ export const useGameStore = defineStore('game', () => {
     return data
   }
 
-  const endGame = async (): Promise<boolean> => {
-    try {
-      await deleteEndGame(sessionID.value)
-      sessionID.value = ''
-      return Promise.resolve(true)
-    } catch (e) {
-      console.error(e)
-      return Promise.reject(false)
-    } finally {
-      state.value = GameState.Picking
-    }
+  const endGame = () => {
+    state.value = GameState.Picking
   }
 
   return { state, setState, createGame, startGame, askGame, endGame, gameAnswer }
